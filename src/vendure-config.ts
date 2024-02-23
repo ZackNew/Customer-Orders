@@ -77,30 +77,33 @@ export const config: VendureConfig = {
     }),
     DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
     DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
-    EmailPlugin.init({
-      devMode: true,
-      outputPath: path.join(__dirname, "../static/email/test-emails"),
-      route: "mailbox",
-      handlers: defaultEmailHandlers,
-      templatePath: path.join(__dirname, "../static/email/templates"),
-      globalTemplateVars: {
-        // The following variables will change depending on your storefront implementation.
-        // Here we are assuming a storefront running at http://localhost:8080.
-        fromAddress: '"example" <noreply@example.com>',
-        verifyEmailAddressUrl: "http://localhost:8080/verify",
-        passwordResetUrl: "http://localhost:8080/password-reset",
-        changeEmailAddressUrl:
-          "http://localhost:8080/verify-email-address-change",
-      },
-    }),
+    // EmailPlugin.init({
+    //   devMode: true,
+    //   outputPath: path.join(__dirname, "../static/email/test-emails"),
+    //   route: "mailbox",
+    //   handlers: defaultEmailHandlers,
+    //   templatePath: path.join(__dirname, "../static/email/templates"),
+    //   globalTemplateVars: {
+    //     // The following variables will change depending on your storefront implementation.
+    //     // Here we are assuming a storefront running at http://localhost:8080.
+    //     fromAddress: '"example" <noreply@example.com>',
+    //     verifyEmailAddressUrl: "http://localhost:8080/verify",
+    //     passwordResetUrl: "http://localhost:8080/password-reset",
+    //     changeEmailAddressUrl:
+    //       "http://localhost:8080/verify-email-address-change",
+    //   },
+    // }),
     AdminUiPlugin.init({
       route: "admin",
       port: 3002,
-      app: compileUiExtensions({
-        outputPath: path.join(__dirname, "__admin-ui"),
-        extensions: [OrderPicklistPlugin.ui],
-        // PicklistPlugin.ui
-      }),
+      // app: compileUiExtensions({
+      //   outputPath: path.join(__dirname, "../admin-ui"),
+      //   extensions: [OrderPicklistPlugin.ui],
+      //   // PicklistPlugin.ui
+      // }),
+      app: {
+        path: path.join(__dirname, "../../admin-ui/dist"),
+      },
     }),
   ],
 };

@@ -3,3 +3,4 @@ dist
 static/assets
 static/email/test-emails
 src/__admin-ui
+admin-ui
