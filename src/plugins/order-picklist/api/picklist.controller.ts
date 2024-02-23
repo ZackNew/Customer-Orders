@@ -5,6 +5,7 @@ import {
   Get,
   Res,
   Param,
+  Query,
   Body,
   BadRequestException,
 } from '@nestjs/common';
@@ -53,44 +54,54 @@ export class PicklistController {
   }
 
   @Allow(picklistPermission.Permission)
-  @Get('/download/:customerId')
+  @Get('/download/:orderCodes')
   async download(
     @Ctx() ctx: RequestContext,
     @Res() res: Response,
-    @Param('customerId') customerId: string
+    @Param('orderCode') orderCode: string
   ) {
-    if (customerId.startsWith('T_')) {
-      const parts = customerId.split('_');
-      customerId = parts[parts.length - 1];
+    if (!ctx.channel?.token) {
+      throw new BadRequestException('No channel set for request');
     }
+    const order = await this.orderService.findOneByCode(ctx, orderCode);
+    if (!order) {
+      throw new UserInputError(`No order with code ${orderCode} found`);
+    }
+    const stream = await this.invoiceService.downloadPicklist(ctx, order);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `inline; filename="preview-invoice.pdf"`,
+    });
+    return stream.pipe(res);
+  }
+
+  @Allow(picklistPermission.Permission)
+  @Get('/download')
+  async downloadMultiple(
+    @Ctx() ctx: RequestContext,
+    @Res() res: Response,
+    @Query('orderCodes') orderCodes: string
+  ) {
     if (!ctx.channel?.token) {
       throw new BadRequestException('No channel set for request');
     }
     const orders = (
-      await this.orderService.findByCustomerId(ctx, customerId, undefined, [
-        'channels',
-        'customer',
-        'customer.user',
-        'lines',
-        'lines.productVariant',
-        'lines.productVariant.taxCategory',
-        'lines.productVariant.productVariantPrices',
-        'lines.productVariant.translations',
-        'lines.featuredAsset',
-        'lines.taxCategory',
-        'shippingLines',
-        'surcharges',
-      ])
+      await this.orderService.findAll(
+        ctx,
+        { filter: { code: { in: orderCodes.split(',') } } },
+        []
+      )
     ).items;
     if (!orders?.length) {
-      throw new UserInputError(
-        `No orders for customer with id ${customerId} found`
-      );
+      throw new UserInputError(`No order with codes ${orderCodes} found`);
     }
-    const stream = await this.invoiceService.downloadPicklist(ctx, orders);
+    const stream = await this.invoiceService.downloadMultiplePicklists(
+      ctx,
+      orders
+    );
     res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `inline; filename="preview-invoice.pdf"`,
+      'Content-Type': 'application/zip',
+      'Content-Disposition': `inline; filename="invoices-${orders.length}.zip"`,
     });
     return stream.pipe(res);
   }

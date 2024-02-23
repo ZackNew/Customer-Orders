@@ -9,8 +9,8 @@ import { AssetServerPlugin } from "@vendure/asset-server-plugin";
 import { AdminUiPlugin } from "@vendure/admin-ui-plugin";
 import "dotenv/config";
 import path from "path";
-import { PicklistPlugin } from "./plugins/picklist-plugin";
 import { compileUiExtensions } from "@vendure/ui-devkit/compiler";
+import { OrderPicklistPlugin } from "./plugins/order-picklist";
 
 const IS_DEV = process.env.APP_ENV === "dev";
 
@@ -65,7 +65,8 @@ export const config: VendureConfig = {
   // need to be updated. See the "Migrations" section in README.md.
   customFields: {},
   plugins: [
-    PicklistPlugin,
+    // PicklistPlugin,
+    OrderPicklistPlugin,
     AssetServerPlugin.init({
       route: "assets",
       assetUploadDir: path.join(__dirname, "../static/assets"),
@@ -97,7 +98,8 @@ export const config: VendureConfig = {
       port: 3002,
       app: compileUiExtensions({
         outputPath: path.join(__dirname, "__admin-ui"),
-        extensions: [PicklistPlugin.ui],
+        extensions: [OrderPicklistPlugin.ui],
+        // PicklistPlugin.ui
       }),
     }),
   ],

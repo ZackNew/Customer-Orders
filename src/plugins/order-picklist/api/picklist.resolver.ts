@@ -1,17 +1,17 @@
-import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   Allow,
   Ctx,
   PermissionDefinition,
   RequestContext,
-} from "@vendure/core";
-import { InvoiceConfigInput } from "../ui/generated/graphql";
-import { InvoiceConfigEntity } from "./invoice-config.entity";
-import { PicklistService } from "./picklist.service";
+} from '@vendure/core';
+import { InvoiceConfigInput } from '../ui/generated/graphql';
+import { InvoiceConfigEntity } from './invoice-config.entity';
+import { PicklistService } from './picklist.service';
 
 export const picklistPermission = new PermissionDefinition({
-  name: "AllowPicklistPermission",
-  description: "Allow this user to use picklists",
+  name: 'AllowPicklistPermission',
+  description: 'Allow this user to use picklists',
 });
 
 @Resolver()
@@ -22,7 +22,7 @@ export class PicklistResolver {
   @Allow(picklistPermission.Permission)
   async upsertInvoiceConfig(
     @Ctx() ctx: RequestContext,
-    @Args("input") input: InvoiceConfigInput
+    @Args('input') input: InvoiceConfigInput
   ): Promise<InvoiceConfigEntity> {
     return await this.service.upsertConfig(ctx, input);
   }

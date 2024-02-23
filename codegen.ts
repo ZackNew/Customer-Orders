@@ -22,6 +22,14 @@ const config: CodegenConfig = {
         "typescript-graphql-request",
       ],
     },
+    "src/plugins/order-picklist/ui/generated/graphql.ts": {
+      documents: "src/plugins/order-picklist/**/*.graphql.ts",
+      plugins: [
+        "typescript",
+        "typescript-operations",
+        "typescript-graphql-request",
+      ],
+    },
   },
 };
 

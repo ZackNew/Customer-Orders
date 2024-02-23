@@ -1,21 +1,21 @@
-import { Component, ChangeDetectorRef, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import {
   DataService,
   getServerLocation,
   LocalStorageService,
   NotificationService,
-} from "@vendure/admin-ui/core";
-import { getConfigQuery, upsertConfigMutation } from "./queries.graphql";
+} from '@vendure/admin-ui/core';
+import { getConfigQuery, upsertConfigMutation } from './queries.graphql';
 import {
   InvoiceConfigQuery,
   UpsertInvoiceConfigMutation,
   UpsertInvoiceConfigMutationVariables,
-} from "./generated/graphql";
-import { firstValueFrom } from "rxjs";
-import { ConfigArgDefinition } from "@vendure/common/lib/generated-types";
+} from './generated/graphql';
+import { firstValueFrom } from 'rxjs';
+import { ConfigArgDefinition } from '@vendure/common/lib/generated-types';
 @Component({
-  selector: "vdr-picklist-component",
+  selector: 'vdr-picklist-component',
   template: `
     <div class="page-block">
       <vdr-page-block>
@@ -26,7 +26,7 @@ import { ConfigArgDefinition } from "@vendure/common/lib/generated-types";
               (click)="save()"
               [disabled]="form.invalid || form.get('templateString')?.pristine"
             >
-              {{ "common.update" | translate }}
+              {{ 'common.update' | translate }}
             </button>
           </vdr-ab-right>
         </vdr-action-bar>
@@ -67,7 +67,7 @@ import { ConfigArgDefinition } from "@vendure/common/lib/generated-types";
       </vdr-page-block>
     </div>
   `,
-  styleUrls: ["./picklist.component.scss"],
+  styleUrls: ['./picklist.component.scss'],
 })
 export class PicklistComponent implements OnInit {
   form: FormGroup;
@@ -75,11 +75,11 @@ export class PicklistComponent implements OnInit {
   invoicePreviewLoading: boolean = false;
   renderNow = false;
   htmlFormInputConfigArgsDef: ConfigArgDefinition = {
-    name: "templateString",
-    type: "text",
+    name: 'templateString',
+    type: 'text',
     list: false,
     required: false,
-    ui: { component: "html-editor-form-input" },
+    ui: { component: 'html-editor-form-input' },
   };
 
   constructor(
@@ -90,9 +90,9 @@ export class PicklistComponent implements OnInit {
     private localStorageService: LocalStorageService
   ) {
     this.form = this.formBuilder.group({
-      enabled: ["enabled"],
-      templateString: ["templateString"],
-      orderCode: [""],
+      enabled: ['enabled'],
+      templateString: ['templateString'],
+      orderCode: [''],
     });
     this.serverPath = getServerLocation();
   }
@@ -102,8 +102,8 @@ export class PicklistComponent implements OnInit {
       .query<InvoiceConfigQuery>(getConfigQuery)
       .mapStream((d) => d.invoiceConfig)
       .subscribe((config) => {
-        this.form.controls["enabled"].setValue(config?.enabled);
-        this.form.controls["templateString"].setValue(config?.templateString);
+        this.form.controls['enabled'].setValue(config?.enabled);
+        this.form.controls['templateString'].setValue(config?.templateString);
         this.renderNow = true;
         this.changeDetector.markForCheck();
       });
@@ -123,17 +123,17 @@ export class PicklistComponent implements OnInit {
           },
         });
         const { upsertInvoiceConfig: result } = await firstValueFrom(result$);
-        this.form.controls["enabled"].setValue(result.enabled);
-        this.form.controls["templateString"].setValue(result.templateString);
+        this.form.controls['enabled'].setValue(result.enabled);
+        this.form.controls['templateString'].setValue(result.templateString);
       }
       this.form.markAsPristine();
       this.changeDetector.markForCheck();
-      this.notificationService.success("common.notify-update-success", {
-        entity: "InvoiceConfig",
+      this.notificationService.success('common.notify-update-success', {
+        entity: 'InvoiceConfig',
       });
     } catch (e: any) {
-      this.notificationService.error("common.notify-update-error", {
-        entity: "InvoiceConfig",
+      this.notificationService.error('common.notify-update-error', {
+        entity: 'InvoiceConfig',
       });
     }
   }
@@ -149,9 +149,9 @@ export class PicklistComponent implements OnInit {
         {
           headers: {
             ...this.getHeaders(),
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({ template }),
         }
       );
@@ -160,7 +160,7 @@ export class PicklistComponent implements OnInit {
         throw Error(json?.message);
       }
       const blob = await res.blob();
-      await this.downloadBlob(blob, "test-invoice.pdf", true);
+      await this.downloadBlob(blob, 'test-invoice.pdf', true);
     } catch (err: any) {
       console.error(err);
       this.notificationService.error(err?.message);
@@ -171,11 +171,11 @@ export class PicklistComponent implements OnInit {
 
   private getHeaders(): Record<string, string> {
     const headers: Record<string, string> = {};
-    const channelToken = this.localStorageService.get("activeChannelToken");
+    const channelToken = this.localStorageService.get('activeChannelToken');
     if (channelToken) {
-      headers["vendure-token"] = channelToken;
+      headers['vendure-token'] = channelToken;
     }
-    const authToken = this.localStorageService.get("authToken");
+    const authToken = this.localStorageService.get('authToken');
     if (authToken) {
       headers.authorization = `Bearer ${authToken}`;
     }
@@ -188,14 +188,14 @@ export class PicklistComponent implements OnInit {
     openInNewTab = false
   ): Promise<void> {
     const blobUrl = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     document.body.appendChild(a);
-    a.setAttribute("hidden", "true");
+    a.setAttribute('hidden', 'true');
     a.href = blobUrl;
     if (!openInNewTab) {
       a.download = fileName;
     }
-    a.setAttribute("target", "_blank");
+    a.setAttribute('target', '_blank');
     a.click();
   }
 }
