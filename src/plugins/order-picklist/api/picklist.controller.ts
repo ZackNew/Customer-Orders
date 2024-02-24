@@ -1,4 +1,4 @@
-import { PicklistService } from './picklist.service';
+import { PicklistService } from "./picklist.service";
 import {
   Controller,
   Post,
@@ -8,8 +8,8 @@ import {
   Query,
   Body,
   BadRequestException,
-} from '@nestjs/common';
-import { Response } from 'express';
+} from "@nestjs/common";
+import { Response } from "express";
 import {
   Allow,
   Ctx,
@@ -17,10 +17,10 @@ import {
   OrderService,
   RequestContext,
   UserInputError,
-} from '@vendure/core';
-import { picklistPermission } from './picklist.resolver';
+} from "@vendure/core";
+import { picklistPermission } from "./picklist.resolver";
 
-@Controller('picklists')
+@Controller("picklists")
 export class PicklistController {
   constructor(
     private readonly invoiceService: PicklistService,
@@ -28,18 +28,18 @@ export class PicklistController {
   ) {}
 
   @Allow(picklistPermission.Permission)
-  @Post('/preview/:orderCode?')
+  @Post("/preview/:orderCode?")
   async preview(
     @Ctx() ctx: RequestContext,
     @Res() res: Response,
     @Body() body: { template: string },
-    @Param('orderCode') orderCode?: string
+    @Param("orderCode") orderCode?: string
   ) {
     if (!ctx.channel?.token) {
-      throw new BadRequestException('No channel set for request');
+      throw new BadRequestException("No channel set for request");
     }
     if (!body?.template || !body?.template.trim()) {
-      throw new BadRequestException('No template given');
+      throw new BadRequestException("No template given");
     }
     const stream = await this.invoiceService.previewInvoiceWithTemplate(
       ctx,
@@ -47,48 +47,48 @@ export class PicklistController {
       orderCode
     );
     res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `inline; filename="preview-invoice.pdf"`,
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="preview-invoice.pdf"`,
     });
     return stream.pipe(res);
   }
 
   @Allow(picklistPermission.Permission)
-  @Get('/download/:orderCodes')
+  @Get("/download/:orderCodes")
   async download(
     @Ctx() ctx: RequestContext,
     @Res() res: Response,
-    @Param('orderCode') orderCode: string
+    @Param("orderCodes") orderCodes: string
   ) {
     if (!ctx.channel?.token) {
-      throw new BadRequestException('No channel set for request');
+      throw new BadRequestException("No channel set for request");
     }
-    const order = await this.orderService.findOneByCode(ctx, orderCode);
+    const order = await this.orderService.findOneByCode(ctx, orderCodes);
     if (!order) {
-      throw new UserInputError(`No order with code ${orderCode} found`);
+      throw new UserInputError(`No order with code ${orderCodes} found`);
     }
     const stream = await this.invoiceService.downloadPicklist(ctx, order);
     res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `inline; filename="preview-invoice.pdf"`,
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="preview-invoice.pdf"`,
     });
     return stream.pipe(res);
   }
 
   @Allow(picklistPermission.Permission)
-  @Get('/download')
+  @Get("/download")
   async downloadMultiple(
     @Ctx() ctx: RequestContext,
     @Res() res: Response,
-    @Query('orderCodes') orderCodes: string
+    @Query("orderCodes") orderCodes: string
   ) {
     if (!ctx.channel?.token) {
-      throw new BadRequestException('No channel set for request');
+      throw new BadRequestException("No channel set for request");
     }
     const orders = (
       await this.orderService.findAll(
         ctx,
-        { filter: { code: { in: orderCodes.split(',') } } },
+        { filter: { code: { in: orderCodes.split(",") } } },
         []
       )
     ).items;
@@ -100,8 +100,8 @@ export class PicklistController {
       orders
     );
     res.set({
-      'Content-Type': 'application/zip',
-      'Content-Disposition': `inline; filename="invoices-${orders.length}.zip"`,
+      "Content-Type": "application/zip",
+      "Content-Disposition": `inline; filename="invoices-${orders.length}.zip"`,
     });
     return stream.pipe(res);
   }

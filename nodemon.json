@@ -1,0 +1,12 @@
+{
+    "watch": [
+        "src/",
+        ".env"
+    ],
+    "ext": "ts,js,json",
+    "ignore": [
+        "src/plugins/**/ui/*",
+        "src/migrations"
+    ],
+    "exec": "npm run concurrently"
+}
