@@ -3,6 +3,16 @@ import {
   DefaultJobQueuePlugin,
   DefaultSearchPlugin,
   VendureConfig,
+  InjectableStrategy,
+  RequestContext,
+  StockLevel,
+  ID,
+  AvailableStock,
+  StockLocation,
+  OrderLine,
+  LocationWithQuantity,
+  ProductVariant,
+  StockDisplayStrategy,
 } from "@vendure/core";
 import { defaultEmailHandlers, EmailPlugin } from "@vendure/email-plugin";
 import { AssetServerPlugin } from "@vendure/asset-server-plugin";
@@ -14,7 +24,15 @@ import { OrderPicklistPlugin } from "./plugins/order-picklist";
 
 const IS_DEV = process.env.APP_ENV === "dev";
 
+export class ExactStockDisplayStrategy implements StockDisplayStrategy {
+    getStockLevel(ctx: RequestContext, productVariant: ProductVariant, saleableStockLevel: number): string {
+        return saleableStockLevel.toString();
+    }
+}
 export const config: VendureConfig = {
+  catalogOptions: {
+    stockDisplayStrategy: new ExactStockDisplayStrategy(),
+},
   apiOptions: {
     port: 3000,
     adminApiPath: "admin-api",
@@ -99,11 +117,14 @@ export const config: VendureConfig = {
       // app: compileUiExtensions({
       //   outputPath: path.join(__dirname, "../admin-ui"),
       //   extensions: [OrderPicklistPlugin.ui],
-      //   // PicklistPlugin.ui
+      //  //  PicklistPlugin.ui
       // }),
       app: {
         path: path.join(__dirname, "../../admin-ui/dist"),
       },
+      // app: {
+      //   path:"/home/aman/Documents/upwork/Customer-Orders/dist/admin-ui",
+      // },
     }),
   ],
 };

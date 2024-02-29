@@ -26,6 +26,7 @@
     "adm-zip": "^0.5.10",
     "copyfiles": "^2.4.1",
     "dotenv": "16.4.5",
+    "ioredis": "^5.3.2",
     "mysql": "2.18.1",
     "pdf-creator-node": "^2.3.5",
     "tmp": "^0.2.1",
