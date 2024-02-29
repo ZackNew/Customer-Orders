@@ -114,14 +114,14 @@ export const config: VendureConfig = {
     AdminUiPlugin.init({
       route: "admin",
       port: 3002,
-      app: compileUiExtensions({
-        outputPath: path.join(__dirname, "../admin-ui"),
-        extensions: [OrderPicklistPlugin.ui],
-       //  PicklistPlugin.ui
-      }),
-      // app: {
-      //   path: path.join(__dirname, "../../admin-ui/dist"),
-      // },
+      // app: compileUiExtensions({
+      //   outputPath: path.join(__dirname, "../admin-ui"),
+      //   extensions: [OrderPicklistPlugin.ui],
+      //  //  PicklistPlugin.ui
+      // }),
+      app: {
+        path: path.join(__dirname, "../../admin-ui/dist"),
+      },
       // app: {
       //   path:"/home/aman/Documents/upwork/Customer-Orders/dist/admin-ui",
       // },
