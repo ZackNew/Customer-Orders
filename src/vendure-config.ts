@@ -13,14 +13,16 @@ import {
   LocationWithQuantity,
   ProductVariant,
   StockDisplayStrategy,
+  OrderStateTransitionEvent,
 } from "@vendure/core";
-import { defaultEmailHandlers, EmailPlugin } from "@vendure/email-plugin";
+import { defaultEmailHandlers, EmailEventListener, EmailPlugin, hydrateShippingLines, transformOrderLineAssetUrls } from "@vendure/email-plugin";
 import { AssetServerPlugin } from "@vendure/asset-server-plugin";
 import { AdminUiPlugin } from "@vendure/admin-ui-plugin";
 import "dotenv/config";
 import path from "path";
 import { compileUiExtensions } from "@vendure/ui-devkit/compiler";
 import { OrderPicklistPlugin } from "./plugins/order-picklist";
+import { AddonPlugin } from "./plugins/addons/addons.plugin";
 
 const IS_DEV = process.env.APP_ENV === "dev";
 
@@ -29,6 +31,30 @@ export class ExactStockDisplayStrategy implements StockDisplayStrategy {
         return saleableStockLevel.toString();
     }
 }
+
+// export const orderConfirmationHandler = new EmailEventListener('order-confirmation')
+//     .on(OrderStateTransitionEvent)
+//     // Only send the email when the Order is transitioning to the
+//     // "PaymentSettled" state and the Order has a customer associated with it.
+//     .filter(
+//         event =>
+//             event.toState === 'PaymentSettled'
+//             && !!event.order.customer,
+//     )
+
+//     .loadData(async ({ event, injector }) => {
+//         transformOrderLineAssetUrls(event.ctx, event.order, injector);
+//         const shippingLines = await hydrateShippingLines(event.ctx, event.order, injector);
+//         return { shippingLines };
+//     })
+//     // Here we are setting the recipient of the email to be the
+//     // customer's email address.
+//     .setRecipient(event => event.order.customer!.emailAddress)
+//     .setFrom('{{ fromAddress }}')
+//     .setSubject('Order confirmation for #{{ order.code }}')
+//     // The object returned here defines the variables which are
+//     // available to the email template.
+//     .setTemplateVars(event => ({ order: event.order, shippingLines: event.data.shippingLines }))
 export const config: VendureConfig = {
   catalogOptions: {
     stockDisplayStrategy: new ExactStockDisplayStrategy(),
@@ -85,6 +111,7 @@ export const config: VendureConfig = {
   plugins: [
     // PicklistPlugin,
     OrderPicklistPlugin,
+    AddonPlugin,
     AssetServerPlugin.init({
       route: "assets",
       assetUploadDir: path.join(__dirname, "../static/assets"),
@@ -104,11 +131,11 @@ export const config: VendureConfig = {
     //   globalTemplateVars: {
     //     // The following variables will change depending on your storefront implementation.
     //     // Here we are assuming a storefront running at http://localhost:8080.
-    //     fromAddress: '"example" <noreply@example.com>',
-    //     verifyEmailAddressUrl: "http://localhost:8080/verify",
-    //     passwordResetUrl: "http://localhost:8080/password-reset",
-    //     changeEmailAddressUrl:
-    //       "http://localhost:8080/verify-email-address-change",
+    //     // fromAddress: '"example" <noreply@example.com>',
+    //     // verifyEmailAddressUrl: "http://localhost:8080/verify",
+    //     // passwordResetUrl: "http://localhost:8080/password-reset",
+    //     // changeEmailAddressUrl:
+    //     //   "http://localhost:8080/verify-email-address-change",
     //   },
     // }),
     AdminUiPlugin.init({

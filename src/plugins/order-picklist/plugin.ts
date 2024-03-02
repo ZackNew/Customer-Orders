@@ -16,6 +16,7 @@ import {
 } from "./api/strategies/redis-session-cache.strategy";
 
 @VendurePlugin({
+  compatibility: "^2.0.0",
   imports: [PluginCommonModule],
   entities: [InvoiceConfigEntity],
   providers: [PicklistService],
@@ -38,6 +39,7 @@ export class OrderPicklistPlugin {
     this.options = options;
     return this;
   }
+  
   static ui: AdminUiExtension = {
     extensionPath: path.join(__dirname, "ui"),
     ngModules: [
