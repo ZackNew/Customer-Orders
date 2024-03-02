@@ -26,11 +26,11 @@ export class AddonService {
     const adminPhone=currentAdmin.customFields;
 
      // send sms
-     const accountSid = 'AC2e223ec59a87385f5237f2e7f2bee67c';
-     const authToken = '7f70f55ba7370acc9189b011315c7d4d';
+     const accountSid =process.env.ACCOUNT_SID;
+     const authToken = process.env.AUTH_TOKEN;
 
      try {
-         const response = await axios.post('https://api.twilio.com/2010-04-01/Accounts/AC2e223ec59a87385f5237f2e7f2bee67c/Messages.json',
+         const response = await axios.post(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
         new URLSearchParams({
           To:adminPhone["phonenumber"],
           From: '+13346001928',
